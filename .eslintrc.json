@@ -12,7 +12,7 @@
     "import/no-default-export": "error",
     "no-unused-vars": ["warn", { "vars": "all", "args": "after-used" }],
     "no-console": ["warn", { "allow": ["warn", "error"] }],
-    "import/no-unused-modules": ["warn", { "unusedExports": true }],
+    "import/no-unused-modules": ["warn", { "unusedExports": true, "src": ["src"] }],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "error",
     "react/no-array-index-key": "warn",
