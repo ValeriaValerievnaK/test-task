@@ -6,14 +6,29 @@ export function Pagination() {
   const [pages, setPages] = useState([]);
   const { apiURL, info, activePage, setActivePage, setApiURL } = useData();
 
-  const pageClickHandler = useCallback(
-    (index) => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setActivePage(index);
-      setApiURL(pages[index]);
-    },
-    [pages, setActivePage, setApiURL]
-  );
+  const handleFirstPage = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActivePage(0);
+    setApiURL(pages[0]);
+  }, [pages, setActivePage, setApiURL]);
+
+  const handlePrevPage = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActivePage(activePage - 1);
+    setApiURL(pages[activePage - 1]);
+  }, [pages, activePage, setActivePage, setApiURL]);
+
+  const handleNextPage = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActivePage(activePage + 1);
+    setApiURL(pages[activePage + 1]);
+  }, [pages, activePage, setActivePage, setApiURL]);
+
+  const handleLastPage = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActivePage(pages.length - 1);
+    setApiURL(pages[pages.length - 1]);
+  }, [pages, setActivePage, setApiURL]);
 
   useEffect(() => {
     if (!apiURL) return;
@@ -37,14 +52,12 @@ export function Pagination() {
         <>
           {activePage - 1 !== 0 && (
             <>
-              <Page onClick={() => pageClickHandler(0)}>« First</Page>
+              <Page onClick={handleFirstPage}>« First</Page>
               <Ellipsis>...</Ellipsis>
             </>
           )}
 
-          <Page onClick={() => pageClickHandler(activePage - 1)}>
-            {activePage}
-          </Page>
+          <Page onClick={handlePrevPage}>{activePage}</Page>
         </>
       )}
 
@@ -52,16 +65,12 @@ export function Pagination() {
 
       {pages[activePage + 1] && (
         <>
-          <Page onClick={() => pageClickHandler(activePage + 1)}>
-            {activePage + 2}
-          </Page>
+          <Page onClick={handleNextPage}>{activePage + 2}</Page>
 
           {activePage + 1 !== pages.length - 1 && (
             <>
               <Ellipsis>...</Ellipsis>
-              <Page onClick={() => pageClickHandler(pages.length - 1)}>
-                Last »
-              </Page>
+              <Page onClick={handleLastPage}>Last »</Page>
             </>
           )}
         </>
