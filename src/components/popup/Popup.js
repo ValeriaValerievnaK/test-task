@@ -25,6 +25,20 @@ export function Popup({ settings: { visible, content = {} }, setSettings }) {
     };
   }, [visible]);
 
+  useEffect(() => {
+    if (!visible) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSettings((prevState) => ({ ...prevState, visible: false }));
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [visible, setSettings]);
+
   const togglePopup = useCallback(
     (e) => {
       if (e.currentTarget !== e.target) {
