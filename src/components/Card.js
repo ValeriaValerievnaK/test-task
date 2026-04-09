@@ -1,25 +1,70 @@
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { ReactComponent as Male } from '../assets/genders/male.svg';
 import { ReactComponent as Female } from '../assets/genders/female.svg';
 import { ReactComponent as Genderless } from '../assets/genders/genderless.svg';
 
-// TODO: Refactor the Card component
-export function Card({
-  status,
-  name,
-  species,
-  type,
-  gender,
-  image,
-  onClickHandler
-}) {
+const COLORS = {
+  alive: '#83bf46',
+  dead: '#ff5152',
+  unknown: '#968c9d',
+  cardBg: '#263750',
+  male: '#33b3c8',
+  female: 'pink',
+  genderless: '#999'
+};
+
+function getGenderIcon(gender) {
+  if (gender === 'Male') {
+    return <Male width={20} height={20} fill={COLORS.male} title="Male" />;
+  }
+  if (gender === 'Female') {
+    return (
+      <Female width={24} height={24} fill={COLORS.female} title="Female" />
+    );
+  }
+  if (gender === 'Genderless' || gender === 'unknown') {
+    return (
+      <Genderless
+        width={24}
+        height={24}
+        fill={COLORS.genderless}
+        title="Genderless"
+      />
+    );
+  }
+
+  return null;
+}
+
+export function Card({ character, onClickHandler }) {
+  const { status, name, species, type, gender, image } = character;
+
+  const handleClick = useCallback(() => {
+    onClickHandler(character);
+  }, [onClickHandler, character]);
+
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClickHandler(character);
+      }
+    },
+    [onClickHandler, character]
+  );
+
   return (
-    <StyledCard onClick={onClickHandler}>
+    <StyledCard
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+    >
       <CardImg src={image} alt={name} />
 
       <CardInfo>
         <CardTitle name={name} gender={gender} />
-
         <CardStatus status={status} species={species} type={type} />
       </CardInfo>
     </StyledCard>
@@ -27,29 +72,12 @@ export function Card({
 }
 
 export function CardTitle({ name, gender, className }) {
-  const Icon = (() => {
-    if (gender === 'Male') {
-      return <Male width={20} height={20} fill="#33b3c8" title="Male" />;
-    }
-
-    if (gender === 'Female') {
-      return <Female width={24} height={24} fill="pink" title="Female" />;
-    }
-
-    if (gender === 'unknown' || gender === 'Genderless') {
-      return (
-        <Genderless width={24} height={24} fill="#999" title="Genderless" />
-      );
-    }
-
-    return null;
-  })();
+  const icon = getGenderIcon(gender);
 
   return (
     <CardTitleContainer className={className}>
       <StyledCardTitle className="card-title">{name}</StyledCardTitle>
-
-      <IconContainer>{Icon}</IconContainer>
+      {icon}
     </CardTitleContainer>
   );
 }
@@ -58,8 +86,8 @@ export function CardStatus({ status, species, type, className }) {
   return (
     <CardStatusContainer className={className}>
       <StyledCardStatus status={status}>{status}</StyledCardStatus>
-      &nbsp;-&nbsp;
-      <CardSpecies>{species}</CardSpecies>
+      {' - '}
+      <span>{species}</span>
       {type && <CardType>{type}</CardType>}
     </CardStatusContainer>
   );
@@ -68,6 +96,8 @@ export function CardStatus({ status, species, type, className }) {
 const CardStatusContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
 `;
 
 const StyledCardStatus = styled.span`
@@ -85,17 +115,15 @@ const StyledCardStatus = styled.span`
     background-color: ${({ status }) => {
       switch (status) {
         case 'Alive':
-          return '#83bf46';
+          return COLORS.alive;
         case 'Dead':
-          return '#ff5152';
+          return COLORS.dead;
         default:
-          return '#968c9d';
+          return COLORS.unknown;
       }
     }};
   }
 `;
-
-const CardSpecies = styled.span``;
 
 const CardType = styled.p`
   margin-top: 20px;
@@ -109,23 +137,34 @@ const StyledCard = styled.div`
   width: 100%;
   max-width: 400px;
   flex-direction: column;
-  background: #263750;
+  background: ${COLORS.cardBg};
   border-radius: 10px;
   transition: transform 0.3s, box-shadow 0.3s;
+  outline: none;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     cursor: pointer;
     transform: scale(1.01);
     box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.2);
   }
 
-  &:hover .card-title {
-    color: #83bf46;
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.alive};
+  }
+
+  &:hover .card-title,
+  &:focus-visible .card-title {
+    color: ${COLORS.alive};
   }
 `;
 
 const CardImg = styled.img`
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
   border-radius: 10px 10px 0 0;
+  object-fit: cover;
 `;
 
 const CardInfo = styled.div`
@@ -133,10 +172,6 @@ const CardInfo = styled.div`
   flex-direction: column;
   color: #fff;
   padding: 20px;
-`;
-
-const IconContainer = styled.div`
-  display: flex;
 `;
 
 const CardTitleContainer = styled.div`
