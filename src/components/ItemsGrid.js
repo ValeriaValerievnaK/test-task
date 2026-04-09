@@ -26,8 +26,12 @@ export function ItemsGrid() {
 
   return (
     <Container>
-      {characters.map((props) => (
-        <Card key={props.id} onClickHandler={cardOnClickHandler} {...props} />
+      {characters.map((character) => (
+        <Card
+          key={character.id}
+          onClickHandler={cardOnClickHandler}
+          character={character}
+        />
       ))}
 
       <Popup settings={popupSettings} setSettings={setPopupSettings} />
